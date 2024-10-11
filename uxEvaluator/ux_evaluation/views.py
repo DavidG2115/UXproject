@@ -1,6 +1,10 @@
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.lib.styles import getSampleStyleSheet
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import SoftwareEvaluado, Categoria, Criterio, EvaluacionCriterio
 from django.contrib.auth import authenticate, login, logout
@@ -132,7 +136,8 @@ def confirmar_enviar_view(request, software_id):
     del request.session['evaluaciones']
 
     # Generar el PDF después de enviar la evaluación
-    return generar_pdf(request, software_id)
+    return generar_pdf(request, software.id)  # Asegúrate de usar el ID correcto aquí
+
 
 
 def handle_software_name_step(request):
@@ -219,18 +224,54 @@ def generar_pdf(request, software_id):
     response['Content-Disposition'] = f'attachment; filename="{software.nombre}_evaluacion.pdf"'
 
     # Crear el PDF
-    p = canvas.Canvas(response, pagesize=letter)
-    width, height = letter
+    doc = SimpleDocTemplate(response, pagesize=letter)
 
-    # Escribir contenido en el PDF
-    p.drawString(100, height - 50, f"Evaluación de Diseño UX: {software.nombre}")
-    p.drawString(100, height - 80, "Criterios de Evaluación:")
+    # Crear elementos para el PDF
+    elements = []
 
-    y_position = height - 120
+    # Obtener estilos
+    styles = getSampleStyleSheet()
+
+    # Título
+    title = Paragraph(f"Evaluación de Diseño UX: {software.nombre}", styles['Title'])
+    elements.append(title)
+
+    # Crear datos para la tabla
+    data = [['Categoría', 'Criterio', 'Puntaje', 'Comentario']]  # Encabezados
+
     for evaluacion in evaluaciones:
-        p.drawString(100, y_position, f"{evaluacion.categoria.nombre}: {evaluacion.criterio.nombre} - Puntaje: {evaluacion.puntaje}, Comentario: {evaluacion.comentario}")
-        y_position -= 20  # Espacio entre líneas
+        row = [
+            evaluacion.categoria.nombre,
+            evaluacion.criterio.nombre,
+            evaluacion.puntaje,
+            evaluacion.comentario
+        ]
+        data.append(row)
 
-    p.showPage()
-    p.save()
+    # Crear la tabla
+    table = Table(data)
+
+    # Estilo de la tabla
+    style = TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Fondo gris para el encabezado
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),  # Texto blanco en el encabezado
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),  # Centrar texto
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Fuente negrita para el encabezado
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),  # Espacio en el encabezado
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),  # Fondo beige para el resto
+        ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Cuadrícula
+    ])
+
+    table.setStyle(style)
+    elements.append(table)
+
+    # Construir el PDF y establecer metadatos
+    doc.build(elements, onFirstPage=lambda canvas, doc: set_metadata(canvas, software.nombre))
+
     return response
+
+def set_metadata(canvas, title):
+    canvas.setTitle(title)  # Cambia 'Anonymous' por el título deseado
+    canvas.setAuthor('Tu Nombre o Empresa')  # Cambia por el nombre del autor
+    canvas.setSubject(f"Evaluación de Diseño UX de {title}")  # Sujeto del documento
+    canvas.setCreator('Tu Nombre o Empresa')  # Cambia por el nombre del creador
