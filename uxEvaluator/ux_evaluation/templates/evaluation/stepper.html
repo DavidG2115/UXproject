@@ -1,0 +1,52 @@
+{% if step == 1 %}
+  <h1>Ingresa el nombre del software para evaluar</h1>
+  <form method="post">
+    {% csrf_token %}
+    <input type="text" name="software_nombre" placeholder="Nombre del software">
+    <button type="submit">Comenzar evaluación</button>
+  </form>
+  {% if error %}<p style="color: red;">{{ error }}</p>{% endif %}
+{% else %}
+  <h1>Evaluación - {{ categoria.nombre }}</h1>
+  <form method="post">
+    {% csrf_token %}
+    <table>
+      <tr>
+        <th>Criterio</th>
+        <th>Descripción</th>
+        <th>Puntaje</th>
+        <th>Comentario</th>
+      </tr>
+      {% for criterio in criterios %}
+      <tr>
+        <td>{{ criterio.nombre }}</td>
+        <td>{{ criterio.descripcion }}</td>
+        <td>
+          <select name="evaluacion_{{ criterio.id }}">
+            <option value="1">1 - Muy Deficiente</option>
+            <option value="2">2 - Deficiente</option>
+            <option value="3">3 - Aceptable</option>
+            <option value="4">4 - Buena</option>
+            <option value="5">5 - Excelente</option>
+          </select>
+        </td>
+        <td><input type="text" name="comentario_{{ criterio.id }}" placeholder="Comentario (opcional)"></td>
+      </tr>
+      {% endfor %}
+    </table>
+    <div>
+      {% if step > 2 %}
+        <a href="{% url 'stepper' step=step|add:"-1" software_id=software.id %}">
+          <button type="button">Regresar</button>
+        </a>
+      {% endif %}
+      {% if step == categorias_totales %}
+      <button type="submit" name="enviar_evaluacion">Enviar evaluación</button>
+      {% else %}
+      <button type="submit" name="siguiente">Siguiente</button>
+      {% endif %}
+    </div>
+  </form>
+{% endif %}
+
+
