@@ -1,0 +1,17 @@
+/* Archivo styles.css */
+h1 {
+    color: green;
+    text-align: center;
+}
+
+p {
+    font-size: 18px;
+    color: blue;
+}
+
+.test-css {
+    color: red;
+    background-color: lightblue;
+    padding: 20px;
+    border: 2px solid black;
+}

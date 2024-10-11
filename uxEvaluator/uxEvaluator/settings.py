@@ -118,7 +118,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Carpeta donde se recolectarán todos los archivos estáticos para producción
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGIN_URL = '/signup/'  # Reemplaza con la URL correcta para tu vista de login

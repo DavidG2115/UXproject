@@ -1,17 +1,50 @@
 
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import SoftwareEvaluado, Categoria, Criterio, EvaluacionCriterio
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    return render(request, 'index.html')  #
+    return render(request, 'evaluation/index.html')  #
 
 def evaluar(request):
-    return render(request, 'templates/evaluar.html')  # 
+    return render(request, 'evaluar.html')  # 
 
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import SoftwareEvaluado, Categoria, Criterio, EvaluacionCriterio
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('index')  # Redirigir al home después de iniciar sesión
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, 'registration/login.html', {'form': form})
 
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()  # Guardar el nuevo usuario
+            login(request, user)  # Autenticar y loguear automáticamente al usuario
+            return redirect('index')  # Redirigir al home después de registrarse
+    else:
+        form = UserCreationForm()
+
+    return render(request, 'registration/signup.html', {'form': form})
+
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+@login_required
 def stepper_view(request, step=1, software_id=None):
     if step == 1:
         return handle_software_name_step(request)
@@ -50,7 +83,7 @@ def stepper_view(request, step=1, software_id=None):
         'evaluaciones': request.session.get('evaluaciones', {}),  # Cargar evaluaciones del session
     })
 
-
+@login_required
 def handle_software_name_step(request):
     if request.method == 'POST':
         software_nombre = request.POST.get('software_nombre')
@@ -65,13 +98,13 @@ def handle_software_name_step(request):
             })
     return render(request, 'evaluation/stepper.html', {'step': 1})
 
-
+@login_required
 def get_software_or_redirect(software_id):
     if not software_id:
         return redirect('index')  # Redirigir si no hay software_id válido
     return get_object_or_404(SoftwareEvaluado, id=software_id)
 
-
+@login_required
 def handle_evaluation_post(request, software, categoria_actual, criterios, step):
     evaluaciones = request.session.get('evaluaciones', {})
     # Crear una entrada para la categoría actual si no existe
@@ -97,7 +130,7 @@ def handle_evaluation_post(request, software, categoria_actual, criterios, step)
 
 
     
-    
+@login_required   
 def resumen_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
     evaluaciones = request.session.get('evaluaciones', {})
