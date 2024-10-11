@@ -1,0 +1,24 @@
+<h1>Resumen de la evaluación - {{ software.nombre }}</h1>
+
+<table>
+    <tr>
+        <th>Categoría</th>
+        <th>Criterio</th>
+        <th>Puntaje</th>
+        <th>Comentario</th>
+    </tr>
+    {% for evaluacion in evaluaciones %}
+    <tr>
+        <td>{{ evaluacion.categoria }}</td>
+        <td>{{ evaluacion.criterio }}</td>
+        <td>{{ evaluacion.puntaje }}</td>
+        <td>{{ evaluacion.comentario }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<form method="post" action="{% url 'confirmar_enviar' software.id %}">
+    {% csrf_token %}
+    <button type="submit">Confirmar y Enviar</button>
+    <a href="{% url 'index' %}">Regresar al inicio</a>
+</form>
