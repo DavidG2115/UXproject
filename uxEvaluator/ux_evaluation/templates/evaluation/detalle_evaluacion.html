@@ -1,42 +1,46 @@
 {% extends 'base.html' %}
 
-
-
 {% block content %}
 
 <div class="container mt-5">
-    <h1>Detalles de Evaluación - {{ software.nombre }}</h1>
+    <h1 class="text-center mb-4">Detalles de Evaluación - {{ software.nombre }}</h1>
     
     {% for categoria, evaluaciones in categorias.items %}
-        <h6 class="card-subtitle mb-2 text-muted">{{ categoria }}</h6>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Criterio</th>
-                    <th>Puntaje</th>
-                    <th>Comentario</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for evaluacion in evaluaciones %}
-                    <tr>
-                        <td>{{ evaluacion.criterio.nombre }}</td>
-                        <td>{{ evaluacion.puntaje }}</td>
-                        <td>{{ evaluacion.comentario|default:"N/A" }}</td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="3">No hay evaluaciones disponibles para esta categoría.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">{{ categoria }}</h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Criterio</th>
+                            <th>Puntaje</th>
+                            <th>Comentario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for evaluacion in evaluaciones %}
+                            <tr>
+                                <td>{{ evaluacion.criterio.nombre }}</td>
+                                <td>{{ evaluacion.puntaje }}</td>
+                                <td>{{ evaluacion.comentario|default:"N/A" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center">No hay evaluaciones disponibles para esta categoría.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     {% endfor %}
+
+    <div class="text-center">
+        <a href="{% url 'generar_pdf' software.id %}" class="btn btn-primary mt-4">Generar PDF</a>
+        <a href="{% url 'index' %}" class="btn btn-secondary mt-4">Regresar</a>
+    </div>
 </div>
-
-<a href="{% url 'generar_pdf' software.id %}" class="btn btn-primary mt-4">Generar PDF</a>
-
-
-
 
 {% endblock %}

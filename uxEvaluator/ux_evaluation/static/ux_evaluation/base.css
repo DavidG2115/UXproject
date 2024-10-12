@@ -1,0 +1,7 @@
+body {
+    font-family: 'Open Sans', sans-serif; /* Fuente para texto principal */
+}
+
+h1, h2, h3, h4 {
+    font-family: 'Roboto', sans-serif; /* Fuente para encabezados */
+}

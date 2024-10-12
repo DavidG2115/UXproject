@@ -1,24 +1,62 @@
-<h1>Resumen de la evaluación - {{ software.nombre }}</h1>
+{% extends 'base.html' %}
 
-<table>
-    <tr>
-        <th>Categoría</th>
-        <th>Criterio</th>
-        <th>Puntaje</th>
-        <th>Comentario</th>
-    </tr>
-    {% for evaluacion in evaluaciones %}
-    <tr>
-        <td>{{ evaluacion.categoria }}</td>
-        <td>{{ evaluacion.criterio }}</td>
-        <td>{{ evaluacion.puntaje }}</td>
-        <td>{{ evaluacion.comentario }}</td>
-    </tr>
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'ux_evaluation/resumen_temporal.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Detalles de Evaluación - {{ software.nombre }}</h1>
+    
+    {% for categoria, evaluaciones in categorias.items %}
+        <h6 class="card-subtitle mb-2 text-muted">{{ categoria }}</h6>
+        <table class="table table-bordered mb-4">
+            <thead class="table-light">
+                <tr>
+                    <th>Criterio</th>
+                    <th>Puntaje</th>
+                    <th>Comentario</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evaluacion in evaluaciones %}
+                    <tr>
+                        <td>{{ evaluacion.criterio.nombre }}</td>
+                        <td>{{ evaluacion.puntaje }}</td>
+                        <td>{{ evaluacion.comentario|default:"N/A" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">No hay evaluaciones disponibles para esta categoría.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% endfor %}
-</table>
+    
+    <div class="text-center my-5">
+        <form method="post" action="{% url 'confirmar_enviar' software.id %}" class="mb-4">
+            {% csrf_token %}
+            <button type="submit" onclick="generarPdf()" class="btn btn-success btn-lg">Confirmar y Enviar</button>
+        </form>
+    
+        <a href="{% url 'index' %}" class="btn btn-secondary btn-lg mt-3">Regresar al Inicio</a>
+    </div>
 
-<form method="post" action="{% url 'confirmar_enviar' software.id %}">
-    {% csrf_token %}
-    <button type="submit">Confirmar y Enviar</button>
-    <a href="{% url 'index' %}">Regresar al inicio</a>
-</form>
+</div>
+
+<script>
+    function generarPdf() {
+        // Redirige a la URL para generar el PDF
+        window.location.href = "{% url 'generar_pdf' software.id %}";
+        
+
+        // Luego, redirige al índice después de un breve retraso
+        setTimeout(function() {
+            window.location.href = "{% url 'index' %}";
+        }, 2000); // Cambia el tiempo según lo necesites (2000 ms = 2 segundos)
+    }
+</script>
+
+{% endblock %}

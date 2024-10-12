@@ -1,17 +1,46 @@
-/* Archivo styles.css */
-h1 {
-    color: green;
-    text-align: center;
+body {
+    background-color: #f0f4f8; /* Color de fondo suave */
 }
 
-p {
-    font-size: 18px;
-    color: blue;
+h1, h2 {
+    color: #003366; /* Azul marino oscuro */
 }
 
-.test-css {
-    color: red;
-    background-color: lightblue;
-    padding: 20px;
-    border: 2px solid black;
+.btn-success {
+    background-color: #28a745; /* Verde más vibrante */
+    border: none; /* Sin borde */
+    transition: background-color 0.3s; /* Transición suave */
+}
+
+.btn-success:hover {
+    background-color: #218838; /* Color más oscuro al pasar el mouse */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Sombra al pasar el mouse */
+}
+
+.card {
+    border-radius: 10px; /* Esquinas redondeadas */
+    overflow: hidden; /* Oculta el desbordamiento */
+    transition: transform 0.2s; /* Efecto de transformación */
+}
+
+.card:hover {
+    transform: scale(1.05); /* Efecto de zoom al pasar el mouse */
+}
+
+.card-header {
+    background-color: #003366; /* Azul marino oscuro */
+    color: white;
+}
+
+.card-body {
+    background-color: white; /* Fondo blanco para el contenido */
+}
+
+.no-evaluaciones {
+    color: #555; /* Texto gris suave */
+    font-size: 1.1em; /* Tamaño de fuente un poco más grande */
+}
+
+.animate__animated {
+    animation-duration: 0.6s; /* Duración de la animación */
 }

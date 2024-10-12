@@ -1,44 +1,46 @@
 {% extends 'base.html' %}
 
-
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'ux_evaluation/index.css' %}">
+{% endblock %}
 
 {% block content %}
 
-
-<h1 class="text-center mb-4">Bienvenido a la Evaluación UX</h1>
-
-<div class="d-flex justify-content-center">
-    <a href="{% url 'stepper' step=1 %}" class="btn btn-success mb-4">Comenzar Evaluación</a>
-</div>
-
 <div class="container mt-5">
-    <h2 class="mb-4">Evaluaciones Realizadas</h2>
+    <h1 class="text-center mb-5">Bienvenido a la Evaluación UX</h1>
+
+    <div class="d-flex justify-content-center mb-4">
+        <a href="{% url 'stepper' step=1 %}" class="btn btn-success btn-lg shadow animate__animated animate__pulse">Comenzar Evaluación</a>
+    </div>
+
+    <h2 class="text-center mb-4">Evaluaciones Realizadas</h2>
 
     <div class="row">
         {% if evaluaciones_por_software %}
             {% for software in evaluaciones_por_software %}
                 <div class="col-md-4 mb-4">
                     <div class="card shadow-sm h-100">
-                        <div class="card-header bg-primary text-white">
+                        <div class="card-header">
                             <h5 class="mb-0">{{ software.nombre }}</h5>
                         </div>
                         <div class="card-body">
-                            <p><strong>Fecha de evaluación:</strong> {{ software.fecha_evaluacion|date:"d M Y" }}</p>
-                            <a href="{% url 'detalle_evaluacion' software.id %}" class="btn btn-outline-primary w-100">Ver detalles</a>
+                            <p class="card-text"><strong>Fecha de evaluación:</strong> {{ software.fecha_evaluacion|date:"d M Y" }}</p>
+                            <a href="{% url 'detalle_evaluacion' software.id %}" class="btn btn-outline-light w-100">Ver detalles</a>
                         </div>
                     </div>
                 </div>
             {% endfor %}
         {% else %}
-            <p class="text-center w-100">No has realizado evaluaciones aún.</p>
+            <div class="col-12 text-center no-evaluaciones">
+                <p>No has realizado evaluaciones aún.</p>
+                <p>¡Comienza tu primera evaluación para mejorar la experiencia de usuario!</p>
+                <div class="d-flex justify-content-center mb-4">
+                    <a href="{% url 'stepper' step=1 %}" class="btn btn-success btn-lg shadow animate__animated animate__pulse">Comenzar Evaluación</a>
+                </div>
+            </div>
         {% endif %}
     </div>
 </div>
-
-
-
-
-
-
 
 {% endblock %}

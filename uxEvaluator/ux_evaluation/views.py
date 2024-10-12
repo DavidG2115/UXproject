@@ -24,7 +24,7 @@ def index(request):
 
 def detalle_evaluacion_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
-    evaluaciones = software.evaluacioncriterio_set.all()
+    evaluaciones = software.evaluacioncriterio_set.all()  # Obtener todas las evaluaciones del software
 
     categorias = {}
     for evaluacion in evaluaciones:
@@ -37,6 +37,7 @@ def detalle_evaluacion_view(request, software_id):
         'software': software,
         'categorias': categorias
     })
+
     
 
 def login_view(request):
@@ -96,9 +97,33 @@ def stepper_view(request, step=1, software_id=None):
             'categoria': categoria_actual,
             'categorias_totales': categorias.count(),
         })
-
     if request.method == 'POST':
         return handle_evaluation_post(request, software, categoria_actual, criterios, step)
+
+    # Definir íconos y descripciones personalizadas para cada categoría
+    iconos_y_descripciones = {
+        1: {
+            'icono': 'fa-hand-point-up',  # Ícono Font Awesome
+            'descripcion': 'Esta categoría se centra en la usabilidad del software.',
+        },
+        2: {
+            'icono': 'fa-cogs',  # Otro ícono Font Awesome
+            'descripcion': 'En esta categoría evaluaremos la funcionalidad del software.',
+        },
+        3: {
+            'icono': 'fa-user',  # Otro ícono Font Awesome
+            'descripcion': 'Aquí se analizará la experiencia del usuario en el software.',
+        },
+        4: {
+            'icono': 'fa-balance-scale',  # Otro ícono Font Awesome
+            'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
+        },
+        5: {
+            'icono': 'fa-balance-scale',  # Otro ícono Font Awesome
+            'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
+        }
+        # Agrega más categorías según sea necesario
+    }
 
     # Renderizar el template
     return render(request, 'evaluation/stepper.html', {
@@ -108,6 +133,8 @@ def stepper_view(request, step=1, software_id=None):
         'criterios': criterios,
         'categorias_totales': categorias.count(),
         'evaluaciones': request.session.get('evaluaciones', {}),
+        'icono': iconos_y_descripciones[step]['icono'],
+        'descripcion': iconos_y_descripciones[step]['descripcion'],
     })
     
     
@@ -115,22 +142,23 @@ def resumen_temporal_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
     evaluaciones = request.session.get('evaluaciones', {})
 
-    # Cargar las evaluaciones temporales desde la sesión
-    evaluaciones_finales = []
+    # Crear un diccionario para agrupar evaluaciones por categoría
+    categorias = {}
     for categoria_id, criterios in evaluaciones.items():
         categoria = get_object_or_404(Categoria, id=categoria_id)
         for criterio_id, evaluacion in criterios.items():
             criterio = get_object_or_404(Criterio, id=criterio_id)
-            evaluaciones_finales.append({
-                'categoria': categoria.nombre,
-                'criterio': criterio.nombre,
+            if categoria.nombre not in categorias:
+                categorias[categoria.nombre] = []  # Inicializa la lista si no existe
+            categorias[categoria.nombre].append({
+                'criterio': criterio,
                 'puntaje': evaluacion['puntaje'],
                 'comentario': evaluacion['comentario'],
             })
 
     return render(request, 'evaluation/resumen_temporal.html', {
         'software': software,
-        'evaluaciones': evaluaciones_finales
+        'categorias': categorias  # Envía el diccionario de categorías
     })
     
 def confirmar_enviar_view(request, software_id):
