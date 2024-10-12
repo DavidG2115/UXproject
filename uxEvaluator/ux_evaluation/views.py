@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib import colors
+from collections import defaultdict
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
 from reportlab.lib.styles import getSampleStyleSheet
@@ -13,8 +14,30 @@ from django.contrib.auth.decorators import login_required
 
 
 def index(request):
-    return render(request, 'evaluation/index.html')  #
+    # Obtener todas las evaluaciones del usuario autenticado, ordenadas de la más reciente a la más antigua
+    evaluaciones_por_software = SoftwareEvaluado.objects.filter(usuario=request.user).order_by('-fecha_evaluacion')
 
+    return render(request, 'evaluation/index.html', {
+        'evaluaciones_por_software': evaluaciones_por_software
+    })
+
+def detalle_evaluacion_view(request, software_id):
+    software = get_object_or_404(SoftwareEvaluado, id=software_id)
+    evaluaciones = software.evaluacioncriterio_set.all()
+
+    categorias = {}
+    for evaluacion in evaluaciones:
+        categoria_nombre = evaluacion.categoria.nombre
+        if categoria_nombre not in categorias:
+            categorias[categoria_nombre] = []
+        categorias[categoria_nombre].append(evaluacion)
+
+    return render(request, 'evaluation/detalle_evaluacion.html', {
+        'software': software,
+        'categorias': categorias
+    })
+    
+ 
 def evaluar(request):
     return render(request, 'evaluar.html')  # 
 
@@ -145,7 +168,7 @@ def handle_software_name_step(request):
         software_nombre = request.POST.get('software_nombre')
         if software_nombre:
             # Crear un nuevo software cada vez que se envía el nombre
-            software = SoftwareEvaluado.objects.create(nombre=software_nombre)
+            software = SoftwareEvaluado.objects.create(nombre=software_nombre, usuario=request.user)
             return redirect('stepper', step=2, software_id=software.id)
         else:
             return render(request, 'evaluation/stepper.html', {
@@ -271,7 +294,7 @@ def generar_pdf(request, software_id):
     return response
 
 def set_metadata(canvas, title):
-    canvas.setTitle(title)  # Cambia 'Anonymous' por el título deseado
+    canvas.setTitle(f'Evaluaccion de {title}')  # Cambia 'Anonymous' por el título deseado
     canvas.setAuthor('Tu Nombre o Empresa')  # Cambia por el nombre del autor
     canvas.setSubject(f"Evaluación de Diseño UX de {title}")  # Sujeto del documento
     canvas.setCreator('Tu Nombre o Empresa')  # Cambia por el nombre del creador

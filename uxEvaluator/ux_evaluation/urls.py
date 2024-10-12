@@ -3,6 +3,7 @@ from . import views  # Importa las vistas desde tu archivo views.py
 
 urlpatterns = [
     path('index/', views.index, name='index'),  # Ruta para la vista principal
+    path('detalle_evaluacion/<int:software_id>/', views.detalle_evaluacion_view, name='detalle_evaluacion'),
     path('', views.login_view, name='login'),
     path('signup/', views.register_view, name='signup'),
     path('logout/', views.logout_view, name='logout_view'),
