@@ -20,6 +20,7 @@ def index(request):
     return render(request, 'evaluation/index.html', {
         'evaluaciones_por_software': evaluaciones_por_software
     })
+    
 
 def detalle_evaluacion_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
@@ -37,9 +38,6 @@ def detalle_evaluacion_view(request, software_id):
         'categorias': categorias
     })
     
- 
-def evaluar(request):
-    return render(request, 'evaluar.html')  # 
 
 def login_view(request):
     if request.method == 'POST':
@@ -207,37 +205,6 @@ def handle_evaluation_post(request, software, categoria_actual, criterios, step)
     # Redirigir al siguiente paso
     return redirect('stepper', step=step + 1, software_id=software.id)
 
-
-    
-   
-def resumen_view(request, software_id):
-    software = get_object_or_404(SoftwareEvaluado, id=software_id)
-    evaluaciones = request.session.get('evaluaciones', {})
-
-    for categoria_id, criterios in evaluaciones.items():
-        categoria = get_object_or_404(Categoria, id=categoria_id)
-        for criterio_id, evaluacion in criterios.items():
-            puntaje = evaluacion['puntaje']
-            comentario = evaluacion['comentario']
-            criterio = get_object_or_404(Criterio, id=criterio_id)
-
-            EvaluacionCriterio.objects.create(
-                software=software,
-                categoria=categoria,
-                criterio=criterio,
-                puntaje=puntaje,
-                comentario=comentario
-            )
-    
-    # Limpiar las evaluaciones de la sesión después de guardar
-    del request.session['evaluaciones']
-
-    evaluaciones_finales = EvaluacionCriterio.objects.filter(software=software)
-
-    return render(request, 'evaluation/resumen.html', {
-        'software': software,
-        'evaluaciones': evaluaciones_finales
-    })
 
 def generar_pdf(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
