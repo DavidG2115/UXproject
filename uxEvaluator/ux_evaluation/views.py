@@ -116,27 +116,27 @@ def stepper_view(request, step=1, software_id=None):
         
     iconos_y_descripciones = {
         1: {
-            'icono': 'fa-hand-point-up',
-            'descripcion': 'Esta categoría se centra en la usabilidad del software.',
+            'icono': 'fa-user-check',
+            'descripcion': 'La usabilidad en UX mide qué tan fácil e intuitivo es para los usuarios interactuar con un producto digital. Se enfoca en que los usuarios puedan realizar tareas de manera eficiente, sin errores y con una experiencia satisfactoria. Un buen diseño usable facilita el aprendizaje, mejora la eficiencia y reduce la frustración, asegurando que el producto sea accesible y agradable de utilizar.',
         },
         2: {
-            'icono': 'fa-cogs',
-            'descripcion': 'En esta categoría evaluaremos la funcionalidad del software.',
+            'icono': 'fa-wheelchair',
+            'descripcion': 'La accesibilidad en UX se refiere a la capacidad de un producto digital para ser utilizado por personas con diversas capacidades o discapacidades. Un diseño accesible garantiza que todos los usuarios, independientemente de sus limitaciones físicas, sensoriales o cognitivas, puedan interactuar y beneficiarse del sistema. Esto incluye el uso de tecnologías asistivas, interfaces claras y adaptaciones para garantizar que el producto sea inclusivo para todos.',
         },
         3: {
-            'icono': 'fa-user',
-            'descripcion': 'Aquí se analizará la experiencia del usuario en el software.',
+            'icono': 'fa-lightbulb',
+            'descripcion': 'La simplicidad en UX se refiere a un diseño limpio y directo, que reduce la complejidad innecesaria para que los usuarios puedan completar sus tareas de manera rápida y sin distracciones. Un diseño simple elimina elementos innecesarios y se enfoca en lo esencial, facilitando la navegación y mejorando la experiencia del usuario.',
         },
         4: {
-            'icono': 'fa-balance-scale',
-            'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
+            'icono': 'fa-sync-alt',
+            'descripcion': 'La consistencia en UX se refiere a la uniformidad en el diseño y la interacción a través de una aplicación o sitio web. Incluye elementos como colores, tipografías, y patrones de navegación. Una experiencia coherente facilita la usabilidad, reduce la carga cognitiva, aumenta la confianza del usuario y refuerza la identidad de la marca.',
         },
         5: {
-            'icono': 'fa-balance-scale',
-            'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
+            'icono': 'fa-users',
+            'descripcion': 'El centrado en el usuario en UX es un enfoque de diseño que prioriza las necesidades, comportamientos y expectativas de los usuarios finales. Implica investigar y comprender a los usuarios a través de métodos como entrevistas, encuestas y pruebas de usabilidad. Este enfoque asegura que las decisiones de diseño se basen en la experiencia real del usuario, mejorando la satisfacción y la efectividad del producto final. ',
         },
         6: {
-            'icono': 'fa-balance-scale',
+            'icono': 'fa-sync-alt',
             'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
         }
     }
