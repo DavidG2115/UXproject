@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+iywto+_&wfx=f0n=0j+e#c#5i440_u(m989e=)mz5v#d1p)cg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['tu_dominio', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -76,8 +76,12 @@ WSGI_APPLICATION = 'uxEvaluator.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'uxEvaluator',
+        'USER': 'postgres',
+        'PASSWORD': 'admin',
+        'HOST': 'localhost',
+        'PORT': '5432',  # Puerto por defecto para PostgreSQL
     }
 }
 
@@ -120,7 +124,7 @@ STATIC_URL = '/static/'
 
 
 # Carpeta donde se recolectarán todos los archivos estáticos para producción
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = BASE_DIR / "static"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -13,7 +13,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-
+@login_required
 def index(request):
     evaluaciones_por_software = SoftwareEvaluado.objects.filter(usuario=request.user).order_by('-fecha_evaluacion')
     return render(request, 'evaluation/index.html', {
@@ -23,7 +23,7 @@ def index(request):
 def evaluacion_view(request):
     return render(request, 'evaluar.html')
 
-
+@login_required
 def detalle_evaluacion_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
     evaluaciones = software.evaluacioncriterio_set.all()
@@ -94,10 +94,10 @@ def stepper_view(request, step=1, software_id=None):
             'error': 'No hay categorías disponibles para evaluar.',
         })
 
-    if step > len(categorias):
+    if step-1 > len(categorias):
         return redirect('resumen_temporal', software_id=software.id)
 
-    categoria_actual = categorias[step - 1]
+    categoria_actual = categorias[step - 2]
     criterios = Criterio.objects.filter(categoria=categoria_actual)
     if not criterios.exists():
         return render(request, 'evaluation/stepper.html', {
@@ -135,10 +135,7 @@ def stepper_view(request, step=1, software_id=None):
             'icono': 'fa-users',
             'descripcion': 'El centrado en el usuario en UX es un enfoque de diseño que prioriza las necesidades, comportamientos y expectativas de los usuarios finales. Implica investigar y comprender a los usuarios a través de métodos como entrevistas, encuestas y pruebas de usabilidad. Este enfoque asegura que las decisiones de diseño se basen en la experiencia real del usuario, mejorando la satisfacción y la efectividad del producto final. ',
         },
-        6: {
-            'icono': 'fa-sync-alt',
-            'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
-        }
+        
     }
 
     return render(request, 'evaluation/stepper.html', {
@@ -148,8 +145,8 @@ def stepper_view(request, step=1, software_id=None):
         'criterios': criterios,
         'categorias_totales': categorias.count(),
         'evaluaciones': request.session.get('evaluaciones', {}),
-        'icono': iconos_y_descripciones[step]['icono'],
-        'descripcion': iconos_y_descripciones[step]['descripcion'],
+        'icono': iconos_y_descripciones[step-1]['icono'],
+        'descripcion': iconos_y_descripciones[step-1]['descripcion'],
         'descripciones_puntajes': descripciones_puntajes
         })
 
@@ -270,7 +267,7 @@ def handle_evaluation_post(request, software, categoria_actual, criterios, step)
     request.session['evaluaciones'] = evaluaciones
     return redirect('stepper', step=step + 1, software_id=software.id)
 
-
+@login_required
 def generar_pdf(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
     evaluaciones = EvaluacionCriterio.objects.filter(software=software).order_by('categoria')

@@ -59,30 +59,32 @@
                     <td>{{ criterio.descripcion }}</td>
                     <td>
                       {% with descripciones=descripciones_puntajes|get_item:criterio.id %}
-                        <div class="form-check">
+                      <div class="d-flex flex-wrap justify-content-center">
+                        <div class="form-check me-3">
                           <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_1" value="1" required data-bs-toggle="tooltip" title="{{ descripciones.0.descripcion }}">
-                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_1">1 - Muy Deficiente</label>
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_1">1</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check me-3">
                           <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_2" value="2" data-bs-toggle="tooltip" title="{{ descripciones.1.descripcion }}">
-                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_2">2 - Deficiente</label>
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_2">2</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check me-3">
                           <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_3" value="3" data-bs-toggle="tooltip" title="{{ descripciones.2.descripcion }}">
-                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_3">3 - Aceptable</label>
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_3">3</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check me-3">
                           <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_4" value="4" data-bs-toggle="tooltip" title="{{ descripciones.3.descripcion }}">
-                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_4">4 - Buena</label>
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_4">4</label>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check me-3">
                           <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_5" value="5" data-bs-toggle="tooltip" title="{{ descripciones.4.descripcion }}">
-                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_5">5 - Excelente</label>
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_5">5</label>
                         </div>
+                      </div>
                       {% endwith %}
                     </td>
                     <td>
-                      <input type="text" name="comentario_{{ criterio.id }}" class="form-control" placeholder="Comentario (opcional)">
+                      <textarea name="comentario_{{ criterio.id }}" class="form-control" placeholder="Comentario (opcional)" rows="3"></textarea>
                     </td>
                   </tr>
                   {% endfor %}
@@ -101,7 +103,7 @@
                         <button type="button" class="btn btn-secondary">Regresar</button>
                       </a>
                     {% endif %}
-                    {% if step == categorias_totales %}
+                    {% if step > categorias_totales %}
                       <button type="submit" name="enviar_evaluacion" class="btn btn-success">Enviar evaluación</button>
                     {% else %}
                       <button type="submit" name="siguiente" class="btn btn-primary">Siguiente</button>
@@ -143,9 +145,21 @@
 
 
 <script>
+    // Inicializa los tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    // Agrega un evento para ocultar el tooltip al seleccionar un input
+    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
+        tooltipTriggerEl.addEventListener('change', function() {
+            // Ocultar el tooltip asociado al input
+            var tooltipInstance = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+            if (tooltipInstance) {
+                tooltipInstance.hide(); // Ocultar el tooltip
+            }
+        });
     });
 
     document.addEventListener("DOMContentLoaded", function() {
