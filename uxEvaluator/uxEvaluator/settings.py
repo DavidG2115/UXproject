@@ -77,11 +77,11 @@ WSGI_APPLICATION = 'uxEvaluator.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'uxEvaluator',
+        'NAME': 'railway',
         'USER': 'postgres',
-        'PASSWORD': 'admin',
-        'HOST': 'localhost',
-        'PORT': '5432',  # Puerto por defecto para PostgreSQL
+        'PASSWORD': 'rJMdvfeWKtOLYAXifkROIhSdNKaaJCRU',
+        'HOST': 'junction.proxy.rlwy.net',
+        'PORT': '34133',  # Puerto por defecto para PostgreSQL
     }
 }
 
