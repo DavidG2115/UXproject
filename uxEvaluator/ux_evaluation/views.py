@@ -4,7 +4,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 from collections import defaultdict
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph , Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import SoftwareEvaluado, Categoria, Criterio, EvaluacionCriterio, DescripcionPuntaje
@@ -225,7 +225,7 @@ def handle_evaluation_post(request, software, categoria_actual, criterios, step)
 
 def generar_pdf(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
-    evaluaciones = EvaluacionCriterio.objects.filter(software=software)
+    evaluaciones = EvaluacionCriterio.objects.filter(software=software).order_by('categoria')
 
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{software.nombre}_evaluacion.pdf"'
@@ -233,38 +233,111 @@ def generar_pdf(request, software_id):
     doc = SimpleDocTemplate(response, pagesize=letter)
     elements = []
     styles = getSampleStyleSheet()
+
+    # Título del documento
     title = Paragraph(f"Evaluación de Diseño UX: {software.nombre}", styles['Title'])
     elements.append(title)
 
-    data = [['Categoría', 'Criterio', 'Puntaje', 'Comentario']]
+    # Agrupar evaluaciones por categoría
+    categoria_actual = None
+    data = [['Criterio', 'Puntaje', 'Comentario']]  # Encabezado común para todas las tablas
+    total_puntaje_categoria = 0  # Inicializar el puntaje de la categoría
+    evaluaciones_categoria = 0  # Contador de evaluaciones en la categoría
+
     for evaluacion in evaluaciones:
-        row = [
-            evaluacion.categoria.nombre,
+        if categoria_actual != evaluacion.categoria:
+            # Si cambiamos de categoría, creamos una nueva tabla y encabezado de categoría
+            if categoria_actual is not None:
+                # Agregar la tabla de la categoría anterior
+                table = Table(data)
+                style = TableStyle([
+                    ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#465362")),  # Encabezado oscuro
+                    ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+                    ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                    ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                    ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Bordes
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Color de fondo para las filas
+                    ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+                    ('TOPPADDING', (0, 0), (-1, -1), 6),
+                ])
+                table.setStyle(style)
+                elements.append(Spacer(1, 12))  # Espacio entre tablas
+                elements.append(table)
+
+                # Cálculo del promedio o total y clasificar el resultado
+                promedio = total_puntaje_categoria / evaluaciones_categoria
+                if promedio >= 4:
+                    resultado = "Bueno"
+                elif promedio >= 3:
+                    resultado = "Regular"
+                elif promedio >= 2:
+                    resultado = "Malo"
+                else:
+                    resultado = "Muy malo"
+
+                # Agregar el texto debajo de la tabla con el puntaje total y la clasificación
+                elements.append(Paragraph(f"Total puntaje: {total_puntaje_categoria} - Resultado: {resultado}", styles['Normal']))
+                elements.append(Spacer(1, 12))  # Espacio antes de la siguiente categoría
+
+            # Título de la nueva categoría
+            categoria_actual = evaluacion.categoria
+            categoria_title = Paragraph(f"Categoría: {categoria_actual.nombre}", styles['Heading2'])
+            elements.append(categoria_title)
+
+            # Reiniciar los datos de la nueva tabla y contadores
+            data = [['Criterio', 'Puntaje', 'Comentario']]
+            total_puntaje_categoria = 0
+            evaluaciones_categoria = 0
+
+        # Añadir filas con los datos de cada evaluación
+        data.append([
             evaluacion.criterio.nombre,
             evaluacion.puntaje,
-            evaluacion.comentario
-        ]
-        data.append(row)
+            evaluacion.comentario or 'N/A'
+        ])
 
-    table = Table(data)
-    style = TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-    ])
-    table.setStyle(style)
-    elements.append(table)
+        # Sumar el puntaje de la categoría actual
+        total_puntaje_categoria += evaluacion.puntaje
+        evaluaciones_categoria += 1
 
+    # Asegurarse de agregar la última tabla restante
+    if data:
+        table = Table(data)
+        style = TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#465362")),  # Encabezado oscuro
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),  # Bordes
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),  # Color de fondo para las filas
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
+            ('TOPPADDING', (0, 0), (-1, -1), 6),
+        ])
+        table.setStyle(style)
+        elements.append(Spacer(1, 12))
+        elements.append(table)
+
+        # Cálculo del promedio o total para la última categoría y clasificación
+        promedio = total_puntaje_categoria / evaluaciones_categoria
+        if promedio >= 4:
+            resultado = "Bueno"
+        elif promedio >= 3:
+            resultado = "Regular"
+        elif promedio >= 2:
+            resultado = "Malo"
+        else:
+            resultado = "Muy malo"
+
+        # Agregar el texto debajo de la última tabla con el puntaje total y la clasificación
+        elements.append(Paragraph(f"Total puntaje: {total_puntaje_categoria} - Resultado: {resultado}", styles['Normal']))
+
+    # Construir el PDF
     doc.build(elements, onFirstPage=lambda canvas, doc: set_metadata(canvas, software.nombre))
     return response
 
-
 def set_metadata(canvas, title):
     canvas.setTitle(f'Evaluaccion de {title}')
-    canvas.setAuthor('Tu Nombre o Empresa')
+    canvas.setAuthor('UX Evaluator')
     canvas.setSubject(f"Evaluación de Diseño UX de {title}")
-    canvas.setCreator('Tu Nombre o Empresa')
