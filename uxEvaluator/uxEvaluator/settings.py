@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'ux_evaluation',
 ]
 
+CSFR_TRUSTED_ORIGINS = ['uxproject-production.up.railway.app']
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
