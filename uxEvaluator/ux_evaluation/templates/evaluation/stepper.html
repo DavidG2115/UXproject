@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% load static %}
+
+{% load custom_filters %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'ux_evaluation/stepper.css' %}">
 {% endblock %}
@@ -23,47 +25,59 @@
       {% endif %}
     </form>
   {% else %}
-    <div class="py-3 m-5 bg-white row g-0 align-items-start">
-      <!-- Icono a la izquierda -->
+    <div class="py-3 m-5 bg-white row g-0 align-items-start shadow">
       <div class="col-md-1 d-flex justify-content-center align-items-start">
           <div class="square-icon-container bg-black rounded-4">
               <i class="fa-solid icon text-white {{ icono }}"></i>
           </div>
       </div>
   
-      <!-- Contenido principal -->
       <div class="col-md-11 content-padding">
         <p class="text-black fs-1 fw-semibold font-family-Inter m-0">{{ step|add:"-1" }}. {{ categoria.nombre }}</p>
         <p class="opacity-75 text-black fs-6 fw-normal font-family-Inter m-1">{{ descripcion }}</p>
       </div>
     </div>
-    <div class="py-3 m-5 bg-white row g-0 align-items-start">
-        <!-- Contenido principal -->
+    <div class="py-3 m-5 bg-white row g-0 align-items-start shadow">
         <div class="col-md-11 content-padding">
             <form method="post" class="mt-4">
               {% csrf_token %}
               <table class="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Criterio</th>
-                    <th>Descripción</th>
-                    <th>Puntaje</th>
-                    <th>Comentario</th>
+                <thead class="table-light">
+                  <tr class="table-dark">
+                    <th scope="col">Criterio</th>
+                    <th scope="col">Descripción</th>
+                    <th scope="col">Puntaje</th>
+                    <th scope="col">Comentario</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for criterio in criterios %}
                   <tr>
-                    <td>{{ criterio.nombre }}</td>
+                    <td scope="row">{{ criterio.nombre }}</td>
                     <td>{{ criterio.descripcion }}</td>
                     <td>
-                      <select name="evaluacion_{{ criterio.id }}" class="form-select">
-                        <option value="1">1 - Muy Deficiente</option>
-                        <option value="2">2 - Deficiente</option>
-                        <option value="3">3 - Aceptable</option>
-                        <option value="4">4 - Buena</option>
-                        <option value="5">5 - Excelente</option>
-                      </select>
+                      {% with descripciones=descripciones_puntajes|get_item:criterio.id %}
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_1" value="1" required data-bs-toggle="tooltip" title="{{ descripciones.0.descripcion }}">
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_1">1 - Muy Deficiente</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_2" value="2" data-bs-toggle="tooltip" title="{{ descripciones.1.descripcion }}">
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_2">2 - Deficiente</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_3" value="3" data-bs-toggle="tooltip" title="{{ descripciones.2.descripcion }}">
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_3">3 - Aceptable</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_4" value="4" data-bs-toggle="tooltip" title="{{ descripciones.3.descripcion }}">
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_4">4 - Buena</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_5" value="5" data-bs-toggle="tooltip" title="{{ descripciones.4.descripcion }}">
+                          <label class="form-check-label" for="evaluacion_{{ criterio.id }}_5">5 - Excelente</label>
+                        </div>
+                      {% endwith %}
                     </td>
                     <td>
                       <input type="text" name="comentario_{{ criterio.id }}" class="form-control" placeholder="Comentario (opcional)">
@@ -90,4 +104,12 @@
     </div>
   {% endif %}
 </div>
+
+<script>
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+</script>
+
 {% endblock %}

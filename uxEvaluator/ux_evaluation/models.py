@@ -36,3 +36,12 @@ class EvaluacionCriterio(models.Model):
 
     def __str__(self):
         return f"Evaluación de {self.software.nombre} - {self.categoria.nombre} - {self.criterio.nombre}"
+
+
+class DescripcionPuntaje(models.Model):
+    criterio = models.ForeignKey(Criterio, on_delete=models.CASCADE)
+    puntaje = models.IntegerField(choices=[(1, 'Muy Deficiente'), (2, 'Deficiente'), (3, 'Aceptable'), (4, 'Buena'), (5, 'Excelente')])
+    descripcion = models.TextField()
+
+    def __str__(self):
+        return f"{self.criterio.nombre} - {self.get_puntaje_display()}"
