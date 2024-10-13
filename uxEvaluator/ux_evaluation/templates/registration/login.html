@@ -3,59 +3,119 @@
 {% block title %}UX Evaluator{% endblock %}
 
 {% block content %}
-<section class="vh-100" style="background-color: #9A616D;">
+<style>
+    body {
+        margin: 0; /* Eliminar margen del body */
+        font-family: 'Arial', sans-serif; /* Fuente moderna */
+        background-color: #f8f9fa; /* Fondo más claro para contraste */
+    }
+    .back {
+        background-color: #465362;
+    }
+
+    .form-outline input {
+        border: 1px solid #ced4da; /* Borde más suave */
+        border-radius: 0.5rem; /* Bordes redondeados */
+        padding-left: 2.5rem; /* Espacio a la izquierda para el icono */
+    }
+
+    .form-outline input:focus {
+        border-color: #007bff; /* Color de borde al enfocar */
+        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Sombra suave */
+    }
+
+    .form-outline i {
+        position: absolute; /* Posición absoluta para el icono */
+        left: 15px; /* Ajuste de la posición a la izquierda */
+        top: 50%; /* Centrando verticalmente */
+        transform: translateY(-50%); /* Ajuste para centrar */
+        color: #007bff; /* Color azul para los iconos */
+    }
+
+    .btn-custom {
+        background-color: #14314e; /* Color de fondo del botón */
+        color: white; /* Color de texto del botón */
+        border-radius: 0.5rem; /* Bordes redondeados */
+    }
+
+    .btn-custom:hover {
+        background-color: #0056b3; /* Color del botón al pasar el mouse */
+    }
+
+    .footer-links a {
+        color: #393f81; /* Color de los enlaces */
+    }
+
+    .footer-links a:hover {
+        text-decoration: underline; /* Subrayado al pasar el mouse */
+    }
+
+    /* Estilo para los mensajes de error */
+    .error-message {
+        color: red; /* Color rojo para errores */
+        font-size: 0.875rem; /* Tamaño de fuente más pequeño */
+        margin-top: 5px; /* Espaciado encima del mensaje de error */
+    }
+</style>
+
+<section class="back vh-100 d-flex justify-content-center align-items-center">
     <div class="container py-5 h-100">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col col-xl-10">
-          <div class="card" style="border-radius: 1rem;">
-            <div class="row g-0">
-              <div class="col-md-6 col-lg-5 d-none d-md-block">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/img1.webp"
-                  alt="login form" class="img-fluid" style="border-radius: 1rem 0 0 1rem;" />
-              </div>
-              <div class="col-md-6 col-lg-7 d-flex align-items-center">
-                <div class="card-body p-4 p-lg-5 text-black">
-  
-                  <form action="" method="post">
-                    {% csrf_token %}
-                    <div class="d-flex align-items-center mb-3 pb-1">
-                      <i class="fas fa-cubes fa-2x me-3" style="color: #ff6219;"></i>
-                      <span class="h1 fw-bold mb-0">Logo</span>
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col col-xl-10">
+                <div class="card shadow-lg" style="border-radius: 1rem;">
+                    <div class="row g-0">
+                        <div class="col-md-6 col-lg-5 d-none d-md-block d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                            <img src="https://scand.de/wp-content/uploads/2023/11/UXUI-main.svg"
+                                 alt="login form" class="img-fluid pt-5 ps-2" style="border-radius: 1rem 0 0 1rem;" />
+                        </div>
+                        <div class="col-md-6 col-lg-7 d-flex align-items-center">
+                            <div class="card-body p-4 p-lg-5 text-black">
+                                <form action="" method="post">
+                                    {% csrf_token %}
+                                    <div class="d-flex align-items-center mb-3 pb-1">
+                                        <i class="fas fa-tasks fa-2x me-3" style="color: #14314e;"></i>
+                                        <span class="h1 fw-bold mb-0">UXEval</span>
+                                    </div>
+
+                                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Inicia sesión en tu cuenta</h5>
+
+                                    <div class="form-outline mb-4 position-relative d-flex align-items-center">
+                                        <i class="fas fa-user fa-lg" style="color: #14314e; margin-right: 10px;"></i>
+                                        <input type="text" name="username" id="username" class="form-control form-control-lg" required>
+                                        {% if form.username.errors %}
+                                            <div class="error-message">{{ form.username.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="form-outline mb-4 position-relative d-flex align-items-center">
+                                        <i class="fas fa-lock fa-lg" style="color: #14314e; margin-right: 10px;"></i>
+                                        <input type="password" name="password" id="password" class="form-control form-control-lg" required>
+                                        {% if form.password.errors %}
+                                            <div class="error-message">{{ form.password.errors }}</div>
+                                        {% endif %}
+                                    </div>
+                                    
+
+                                    <div class="pt-1 mb-4">
+                                        <button type="submit" class="btn btn-custom btn-lg btn-block">Ingresar</button>
+                                    </div>
+
+                                    {% if form.non_field_errors %}
+                                        <div class="error-message pb-2">{{ form.non_field_errors.0 }}</div>
+                                    {% endif %}
+
+                                    <div class="footer-links">
+                                        <a class="small text-muted" href="#!">Olvide la contraseña</a>
+                                        <p class="mb-5 pb-lg-2" style="color: #393f81;">No tienes cuenta? <a href="{% url 'signup' %}" style="color: #393f81;">Registrate aqui</a></p>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                     </div>
-  
-                    <h5 class="fw-normal mb-3 pb-3" style="letter-spacing: 1px;">Sign into your account</h5>
-  
-                    <div data-mdb-input-init class="form-outline mb-4">
-                        <label for="username">Username</label>
-                        <input type="text" name="username" id="username" class="form-control form-control-lg" required>
-                    </div>
-  
-                    <div data-mdb-input-init class="form-outline mb-4">
-                        <label for="password">Password</label>
-                        <input type="password" name="password" id="password" class="form-control form-control-lg" required>
-                    </div>
-  
-                    <div class="pt-1 mb-4">
-                      {% comment %} <button class="btn btn-dark btn-lg btn-block" type="submit">Login</button> {% endcomment %}
-                      <button type="submit" class="btn btn-dark btn-lg btn-block">Login</button>
-                    </div>
-                    {{ form.errors }}
-  
-                    <a class="small text-muted" href="#!">Forgot password?</a>
-                    <p class="mb-5 pb-lg-2" style="color: #393f81;">Don't have an account? <a href="{% url 'signup' %}"
-                        style="color: #393f81;">Register here</a></p>
-                    <a href="#!" class="small text-muted">Terms of use.</a>
-                    <a href="#!" class="small text-muted">Privacy policy</a>
-                  </form>
-  
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </section>
+</section>
 
 {% endblock %}
-
