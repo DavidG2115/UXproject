@@ -1,0 +1,25 @@
+.square-icon-container {
+    position: relative;
+    width: 60px; /* Ancho completo */
+    padding-top: 60px; /* Mantiene la relación 1:1 */
+    margin-top: 20px;
+}
+
+.icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 40px; /* Tamaño del ícono */
+}
+
+/* Estilos responsivos */
+.content-padding {
+    padding: 0.5rem 1rem; /* Padding para pantallas pequeñas */
+}
+
+@media (min-width: 768px) { /* Para pantallas medianas y grandes */
+    .content-padding {
+        padding: 1rem 2rem; /* Ajuste de padding para pantallas más grandes */
+    }
+}

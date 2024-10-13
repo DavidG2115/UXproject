@@ -6,8 +6,8 @@
     <h1 class="text-center mb-4">Detalles de Evaluación - {{ software.nombre }}</h1>
     
     {% for categoria, evaluaciones in categorias.items %}
-        <div class="card mb-4">
-            <div class="card-header">
+        <div class="card mb-4 shadow-sm"> <!-- Añadido shadow para mejor visualización -->
+            <div class="card-header bg-dark text-white"> <!-- Encabezado oscuro para contraste -->
                 <h6 class="mb-0">{{ categoria }}</h6>
             </div>
             <div class="card-body">
@@ -38,7 +38,7 @@
     {% endfor %}
 
     <div class="text-center">
-        <a href="{% url 'generar_pdf' software.id %}" class="btn btn-primary mt-4">Generar PDF</a>
+        <a href="{% url 'generar_pdf' software.id %}" class="btn btn-success mt-4">Generar PDF</a> <!-- Botón verde para el PDF -->
         <a href="{% url 'index' %}" class="btn btn-secondary mt-4">Regresar</a>
     </div>
 </div>

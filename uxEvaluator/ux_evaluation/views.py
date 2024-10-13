@@ -19,6 +19,9 @@ def index(request):
         'evaluaciones_por_software': evaluaciones_por_software
     })
 
+def evaluacion_view(request):
+    return render(request, 'evaluar.html')
+
 
 def detalle_evaluacion_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
