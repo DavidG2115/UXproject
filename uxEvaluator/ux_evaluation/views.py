@@ -134,6 +134,10 @@ def stepper_view(request, step=1, software_id=None):
         5: {
             'icono': 'fa-balance-scale',
             'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
+        },
+        6: {
+            'icono': 'fa-balance-scale',
+            'descripcion': 'En esta categoría evaluaremos la accesibilidad del software.',
         }
     }
 
@@ -153,18 +157,31 @@ def stepper_view(request, step=1, software_id=None):
 def resumen_temporal_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
     evaluaciones = request.session.get('evaluaciones', {})
-
     categorias = {}
     for categoria_id, criterios in evaluaciones.items():
-        categoria = get_object_or_404(Categoria, id=categoria_id)
+        try:
+            categoria_id_int = int(categoria_id)
+        except ValueError:
+            messages.error(request, f'ID de categoría no válido: {categoria_id}')
+            return redirect('index')
+
+        categoria = get_object_or_404(Categoria, id=categoria_id_int)
+        categorias[categoria] = []
         for criterio_id, evaluacion in criterios.items():
-            criterio = get_object_or_404(Criterio, id=criterio_id)
-            if categoria.nombre not in categorias:
-                categorias[categoria.nombre] = []
-            categorias[categoria.nombre].append({
+            if criterio_id == 'puntaje' or criterio_id == 'comentario':
+                continue  # Ignorar entradas incorrectas
+
+            try:
+                criterio_id_int = int(criterio_id)
+            except ValueError:
+                messages.error(request, f'ID de criterio no válido: {criterio_id}')
+                return redirect('index')
+
+            criterio = get_object_or_404(Criterio, id=criterio_id_int)
+            categorias[categoria].append({
                 'criterio': criterio,
                 'puntaje': evaluacion['puntaje'],
-                'comentario': evaluacion['comentario'],
+                'comentario': evaluacion['comentario']
             })
 
     return render(request, 'evaluation/resumen_temporal.html', {
@@ -177,13 +194,25 @@ def confirmar_enviar_view(request, software_id):
     software = get_object_or_404(SoftwareEvaluado, id=software_id)
     evaluaciones = request.session.get('evaluaciones', {})
 
-    if not evaluaciones:
-        return redirect('index')
-
     for categoria_id, criterios in evaluaciones.items():
-        categoria = get_object_or_404(Categoria, id=categoria_id)
+        try:
+            categoria_id_int = int(categoria_id)
+        except ValueError:
+            messages.error(request, f'ID de categoría no válido: {categoria_id}')
+            return redirect('index')
+
+        categoria = get_object_or_404(Categoria, id=categoria_id_int)
         for criterio_id, evaluacion in criterios.items():
-            criterio = get_object_or_404(Criterio, id=criterio_id)
+            if criterio_id == 'puntaje' or criterio_id == 'comentario':
+                continue  # Ignorar entradas incorrectas
+
+            try:
+                criterio_id_int = int(criterio_id)
+            except ValueError:
+                messages.error(request, f'ID de criterio no válido: {criterio_id}')
+                return redirect('index')
+
+            criterio = get_object_or_404(Criterio, id=criterio_id_int)
             EvaluacionCriterio.objects.create(
                 software=software,
                 categoria=categoria,
@@ -192,8 +221,9 @@ def confirmar_enviar_view(request, software_id):
                 comentario=evaluacion['comentario']
             )
 
-    del request.session['evaluaciones']
-
+    # Limpiar las evaluaciones de la sesión después de guardarlas
+    request.session['evaluaciones'] = {}
+    messages.success(request, 'Evaluación enviada correctamente.')
     return generar_pdf(request, software.id)
 
 
@@ -226,8 +256,14 @@ def handle_evaluation_post(request, software, categoria_actual, criterios, step)
         puntaje = request.POST.get(f'evaluacion_{criterio.id}')
         comentario = request.POST.get(f'comentario_{criterio.id}')
         if puntaje:
-            evaluaciones[str(categoria_actual.id)][criterio.id] = {
-                'puntaje': int(puntaje),
+            try:
+                puntaje_int = int(puntaje)
+            except ValueError:
+                messages.error(request, f'El puntaje para el criterio {criterio.nombre} no es válido.')
+                return redirect('stepper', step=step, software_id=software.id)
+            
+            evaluaciones[str(categoria_actual.id)][str(criterio.id)] = {
+                'puntaje': puntaje_int,
                 'comentario': comentario
             }
 

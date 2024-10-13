@@ -2,8 +2,8 @@
 {% block title %}UX Evaluator{% endblock %}
 
 {% load static %}
-
 {% load custom_filters %}
+
 {% block css %}
     <link rel="stylesheet" href="{% static 'ux_evaluation/stepper.css' %}">
 {% endblock %}
@@ -40,6 +40,7 @@
     </div>
     <div class="py-3 m-5 bg-white row g-0 align-items-start shadow">
         <div class="col-md-11 content-padding">
+          <h2 class="text-start">Se esta evaluando: {{ software.nombre }}</h2>
             <form method="post" class="mt-4">
               {% csrf_token %}
               <table class="table table-bordered">
@@ -89,16 +90,24 @@
               </table>
 
               <div class="text-center mt-4">
-                {% if step > 2 %}
-                  <a href="{% url 'stepper' step=step|add:"-1" software_id=software.id %}">
-                    <button type="button" class="btn btn-secondary">Regresar</button>
-                  </a>
-                {% endif %}
-                {% if step == categorias_totales %}
-                  <button type="submit" name="enviar_evaluacion" class="btn btn-success">Enviar evaluación</button>
-                {% else %}
-                  <button type="submit" name="siguiente" class="btn btn-primary">Siguiente</button>
-                {% endif %}
+                <div class="d-flex justify-content-between">
+                  <div>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">Cancelar</button>
+                  </div>
+                  
+                  <div>
+                    {% if step > 2 %}
+                      <a href="{% url 'stepper' step=step|add:"-1" software_id=software.id %}">
+                        <button type="button" class="btn btn-secondary">Regresar</button>
+                      </a>
+                    {% endif %}
+                    {% if step == categorias_totales %}
+                      <button type="submit" name="enviar_evaluacion" class="btn btn-success">Enviar evaluación</button>
+                    {% else %}
+                      <button type="submit" name="siguiente" class="btn btn-primary">Siguiente</button>
+                    {% endif %}
+                  </div>
+                </div>
               </div>
             </form>
         </div>
@@ -106,10 +115,49 @@
   {% endif %}
 </div>
 
+<!-- Modal de confirmación de cancelación -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cancelModalLabel">Confirmar Cancelación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ¿Quieres cancelar la evaluación?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        {% if software %}
+          <form method="post" action="{% url 'eliminar_evaluacion' software_id=software.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Confirmar Cancelación</button>
+          </form>
+        {% else %}
+          <button type="button" class="btn btn-danger" disabled>Confirmar Cancelación</button>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
 <script>
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+      // Selecciona todos los enlaces en la barra de navegación
+      const navLinks = document.querySelectorAll('nav a');
+  
+      // Deshabilita los enlaces
+      navLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+          event.preventDefault(); // Previene la acción de navegación
+        });
+      });
     });
 </script>
 
