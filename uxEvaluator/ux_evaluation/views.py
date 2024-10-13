@@ -11,6 +11,7 @@ from .models import SoftwareEvaluado, Categoria, Criterio, EvaluacionCriterio, D
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 def index(request):
@@ -36,6 +37,17 @@ def detalle_evaluacion_view(request, software_id):
         'software': software,
         'categorias': categorias
     })
+    
+def eliminar_evaluacion(request, software_id):
+    software = get_object_or_404(SoftwareEvaluado, id=software_id)
+
+    if request.method == 'POST':
+        # Eliminar el software evaluado
+        software.delete()
+        return redirect('index')  # Redirige a la página de inicio o a donde desees
+
+    # Si no es POST, redirige o muestra un error
+    return redirect('detalle_evaluacion', software_id=software.id)
 
 
 def login_view(request):

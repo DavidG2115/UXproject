@@ -2,13 +2,12 @@
 {% block title %}UX Evaluator {{ software.nombre }}{% endblock %}
 
 {% block content %}
-
 <div class="container mt-5">
     <h1 class="text-center mb-4">Detalles de Evaluación - {{ software.nombre }}</h1>
     
     {% for categoria, evaluaciones in categorias.items %}
-        <div class="card mb-4 shadow-sm"> <!-- Añadido shadow para mejor visualización -->
-            <div class="card-header bg-dark text-white"> <!-- Encabezado oscuro para contraste -->
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white">
                 <h6 class="mb-0">{{ categoria }}</h6>
             </div>
             <div class="card-body">
@@ -38,10 +37,49 @@
         </div>
     {% endfor %}
 
-    <div class="text-center">
-        <a href="{% url 'generar_pdf' software.id %}" class="btn btn-success mt-4">Generar PDF</a> <!-- Botón verde para el PDF -->
-        <a href="{% url 'index' %}" class="btn btn-secondary mt-4">Regresar</a>
+    <div class="d-flex justify-content-center align-items-center">
+        <a href="{% url 'generar_pdf' software.id %}" class="btn btn-success m-4">Generar PDF</a>
+        <a href="{% url 'index' %}" class="btn btn-secondary m-4">Regresar</a>
+        
+        <!-- Botón para eliminar toda la evaluación -->
+        <button class="btn btn-danger mt-4 ms-auto" data-toggle="modal" data-target="#confirmDeleteModal" data-software-id="{{ software.id }}">
+            Eliminar Evaluación
+        </button>
     </div>
 </div>
 
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="close ms-auto" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar toda la evaluación?
+            </div>
+            <div class="modal-footer">
+                <form id="deleteForm" method="post" style="display: inline;">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#confirmDeleteModal').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget); // Botón que activó el modal
+            var softwareId = button.data('software-id'); // Extraer el ID del software
+            var form = $('#deleteForm');
+            form.attr('action', '/software/' + softwareId + '/eliminar/'); // Cambiar la acción del formulario
+        });
+    });
+</script>
 {% endblock %}

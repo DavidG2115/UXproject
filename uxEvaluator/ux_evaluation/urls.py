@@ -13,6 +13,8 @@ urlpatterns = [
     path('detalle_evaluacion/<int:software_id>/', views.detalle_evaluacion_view, name='detalle_evaluacion'),
     # Ruta para el resumen temporal antes de confirmar
     path('resumen_temporal/<int:software_id>/', views.resumen_temporal_view, name='resumen_temporal'),
+    
+    path('software/<int:software_id>/eliminar/', views.eliminar_evaluacion, name='eliminar_evaluacion'),
     # Ruta para confirmar y enviar la evaluación
     path('confirmar_enviar/<int:software_id>/', views.confirmar_enviar_view, name='confirmar_enviar'),
     # Ruta para generar el pdf
