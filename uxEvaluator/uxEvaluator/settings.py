@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-+iywto+_&wfx=f0n=0j+e#c#5i440_u(m989e=)mz5v#d1p)cg'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['tu_dominio', 'localhost', '127.0.0.1']
 
@@ -131,4 +131,4 @@ STATIC_ROOT = BASE_DIR / "static"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-LOGIN_URL = '/signup/'  # Reemplaza con la URL correcta para tu vista de login
+LOGIN_URL = '/login/'  # Reemplaza con la URL correcta para tu vista de login
