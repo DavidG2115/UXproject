@@ -20,8 +20,6 @@ def index(request):
         'evaluaciones_por_software': evaluaciones_por_software
     })
 
-def evaluacion_view(request):
-    return render(request, 'evaluar.html')
 
 @login_required
 def detalle_evaluacion_view(request, software_id):
