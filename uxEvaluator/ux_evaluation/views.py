@@ -368,16 +368,22 @@ def generar_pdf(request, software_id):
         elements.append(Spacer(1, 12))
         elements.append(table)
 
-        # Cálculo del promedio o total para la última categoría y clasificación
-        promedio = total_puntaje_categoria / evaluaciones_categoria
-        if promedio >= 4:
-            resultado = "Bueno"
-        elif promedio >= 3:
-            resultado = "Regular"
-        elif promedio >= 2:
-            resultado = "Malo"
+        if evaluaciones_categoria > 0:
+            promedio = total_puntaje_categoria / evaluaciones_categoria
+            
+            if promedio >= 4.5:
+                resultado = "Excelente"
+            elif promedio >= 4:
+                resultado = "Bueno"
+            elif promedio >= 3:
+                resultado = "Regular"
+            elif promedio >= 2:
+                resultado = "Malo"
+            else:
+                resultado = "Muy malo"
+                
         else:
-            resultado = "Muy malo"
+            resultado = "No hay evaluaciones"
 
         # Agregar el texto debajo de la última tabla con el puntaje total y la clasificación
         elements.append(Paragraph(f"Total puntaje: {total_puntaje_categoria} - Resultado: {resultado}", styles['Normal']))
