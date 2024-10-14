@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-+iywto+_&wfx=f0n=0j+e#c#5i440_u(m989e=)mz5v#d1p)cg
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['uxproject-production.up.railway.app']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -76,14 +76,15 @@ WSGI_APPLICATION = 'uxEvaluator.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'railway',
         'USER': 'postgres',
-        'PASSWORD': 'rJMdvfeWKtOLYAXifkROIhSdNKaaJCRU',
-        'HOST': 'junction.proxy.rlwy.net',
-        'PORT': '34133',  # Puerto por defecto para PostgreSQL
+        'PASSWORD': 'whtQlWXCgMwEFwdEyGVJwgmnHBEdTCMM',
+        'HOST': 'autorack.proxy.rlwy.net',
+        'PORT': '23565',  
     }
 }
 
