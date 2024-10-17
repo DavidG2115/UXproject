@@ -1,2 +1,2 @@
-release: npm install && npm run build
-web: python manage.py migrate && python manage.py collectstatic --noinput && gunicorn uxEvaluator.wsgi
+
+web: python manage.py tailwind build && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn uxEvaluator.wsgi
