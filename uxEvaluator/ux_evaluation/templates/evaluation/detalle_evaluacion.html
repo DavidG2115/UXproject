@@ -2,33 +2,33 @@
 {% block title %}UX Evaluator {{ software.nombre }}{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Detalles de Evaluación - {{ software.nombre }}</h1>
+<div class="container mx-auto mt-12 px-4">
+    <h1 class="text-center text-4xl font-bold mb-8 text-gray-800 dark:text-white">Detalles de Evaluación - {{ software.nombre }}</h1>
     
     {% for categoria, evaluaciones in categorias.items %}
-        <div class="card mb-4 shadow-sm">
-            <div class="card-header bg-dark text-white">
-                <h6 class="mb-0">{{ categoria }}</h6>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg mb-6 overflow-hidden">
+            <div class="bg-gray-800 text-white px-6 py-3">
+                <h6 class="text-lg font-semibold">{{ categoria }}</h6>
             </div>
-            <div class="card-body">
-                <table class="table table-bordered table-striped">
-                    <thead class="thead-light">
+            <div class="px-6 py-4">
+                <table class="min-w-full text-left table-auto">
+                    <thead class="bg-gray-200 dark:bg-gray-700">
                         <tr>
-                            <th>Criterio</th>
-                            <th>Puntaje</th>
-                            <th>Comentario</th>
+                            <th class="px-4 py-2 text-gray-600 dark:text-gray-300">Criterio</th>
+                            <th class="px-4 py-2 text-gray-600 dark:text-gray-300">Puntaje</th>
+                            <th class="px-4 py-2 text-gray-600 dark:text-gray-300">Comentario</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="bg-white dark:bg-gray-800">
                         {% for evaluacion in evaluaciones %}
-                            <tr>
-                                <td>{{ evaluacion.criterio.nombre }}</td>
-                                <td>{{ evaluacion.puntaje }}</td>
-                                <td>{{ evaluacion.comentario|default:"N/A" }}</td>
+                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ evaluacion.criterio.nombre }}</td>
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ evaluacion.puntaje }}</td>
+                                <td class="px-4 py-3 text-gray-700 dark:text-gray-300">{{ evaluacion.comentario|default:"N/A" }}</td>
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="3" class="text-center">No hay evaluaciones disponibles para esta categoría.</td>
+                                <td colspan="3" class="px-4 py-4 text-center text-gray-500 dark:text-gray-400">No hay evaluaciones disponibles para esta categoría.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -37,49 +37,53 @@
         </div>
     {% endfor %}
 
-    <div class="d-flex justify-content-center align-items-center">
-        <a href="{% url 'generar_pdf' software.id %}" class="btn btn-success m-4">Generar PDF</a>
-        <a href="{% url 'index' %}" class="btn btn-secondary m-4">Regresar</a>
+    <div class="flex justify-center items-center space-x-4 mt-8">
+        <a href="{% url 'generar_pdf' software.id %}" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg shadow-lg">
+            Generar PDF
+        </a>
+        <a href="{% url 'index' %}" class="bg-gray-500 hover:bg-gray-600 text-white py-3 px-6 rounded-lg shadow-lg">
+            Regresar
+        </a>
         
         <!-- Botón para eliminar toda la evaluación -->
-        <button class="btn btn-danger mt-4 ms-auto" data-toggle="modal" data-target="#confirmDeleteModal" data-software-id="{{ software.id }}">
+        <button class="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-lg shadow-lg" data-software-id="{{ software.id }}" onclick="toggleModal()">
             Eliminar Evaluación
         </button>
     </div>
 </div>
 
 <!-- Modal de confirmación de eliminación -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
-                <button type="button" class="close ms-auto" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                ¿Estás seguro de que deseas eliminar toda la evaluación?
-            </div>
-            <div class="modal-footer">
-                <form id="deleteForm" method="post" style="display: inline;">
-                    {% csrf_token %}
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                    <button type="submit" class="btn btn-danger">Eliminar</button>
-                </form>
-            </div>
+<div id="confirmDeleteModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden w-96">
+        <div class="bg-gray-800 text-white px-6 py-3">
+            <h5 class="text-lg font-semibold">Confirmar Eliminación</h5>
+        </div>
+        <div class="px-6 py-4">
+            <p class="text-gray-700 dark:text-gray-300">¿Estás seguro de que deseas eliminar toda la evaluación?</p>
+        </div>
+        <div class="flex justify-end px-6 py-4 space-x-4">
+            <button class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg" onclick="toggleModal()">Cancelar</button>
+            <form id="deleteForm" method="post">
+                {% csrf_token %}
+                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">Eliminar</button>
+            </form>
         </div>
     </div>
 </div>
 
 <script>
-    $(document).ready(function() {
-        $('#confirmDeleteModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget); // Botón que activó el modal
-            var softwareId = button.data('software-id'); // Extraer el ID del software
-            var form = $('#deleteForm');
-            form.attr('action', '/software/' + softwareId + '/eliminar/'); // Cambiar la acción del formulario
+    function toggleModal() {
+        document.getElementById('confirmDeleteModal').classList.toggle('hidden');
+    }
+
+    // Cambiar la acción del formulario de eliminación al abrir el modal
+    document.querySelectorAll('[data-software-id]').forEach(button => {
+        button.addEventListener('click', function() {
+            var softwareId = this.getAttribute('data-software-id');
+            var form = document.getElementById('deleteForm');
+            form.action = '/software/' + softwareId + '/eliminar/';
         });
     });
 </script>
+
 {% endblock %}
