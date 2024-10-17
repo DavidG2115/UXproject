@@ -1,5 +1,6 @@
+{% load static tailwind_tags %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark:bg-gray-900 dark:text-white">
   <head>
     {% load static %}
     <meta charset="UTF-8">
@@ -13,63 +14,47 @@
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
     
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    
     <link rel="stylesheet" href="{% static 'ux_evaluation/base.css' %}">
+    {% tailwind_css %}
     {% block css %}{% endblock %}
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     
-    <script>
-      function mostrarDescripcion(puntaje, id) {
-        // Ocultar todas las descripciones
-        const descripciones = document.querySelectorAll(`.puntaje-descripcion[data-id='${id}']`);
-        descripciones.forEach(desc => desc.style.display = 'none');
-        
-        // Mostrar la descripción correspondiente
-        const descripcion = document.querySelector(`.puntaje-descripcion[data-id='${id}'][data-puntaje='${puntaje}']`);
-        if (descripcion) {
-          descripcion.style.display = 'block';
-        }
-      }
-      
-    </script>
+    
   </head>
   
-{% if user.is_authenticated %}
-<nav class="navbar navbar-expand-lg navbar-light bg-dark" data-bs-theme="dark">
-  <div class="container-fluid">
-    <!-- Enlace a la izquierda para redirigir al inicio -->
-    <a class="navbar-brand" href="{% url 'index' %}">UX Evaluator</a>
-
-    <!-- Botón de colapso para pantallas pequeñas -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Contenido de la navbar -->
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto"> <!-- Alínea los elementos a la derecha -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Perfil
-          </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            {% comment %} <li><a class="dropdown-item" href="{% url 'profile' %}">Ver Perfil</a></li> {% endcomment %}
-            <li><a class="dropdown-item" href="{% url 'logout_view' %}">Cerrar sesión</a></li>
-          </ul>
-        </li>
-      </ul>
+  {% if user.is_authenticated %}
+  <nav class="bg-gray-100 dark:bg-gray-800 p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Enlace a la izquierda para redirigir al inicio -->
+      <a class="text-2xl font-semibold text-black dark:text-white" href="{% url 'index' %}">UX Evaluator</a>
+  
+      <!-- Botón para cambiar entre modo claro y oscuro -->
+      <button onclick="toggleDarkMode()" class="bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-4 py-2 rounded-lg ml-4">
+        <i class="fas fa-moon"></i> / <i class="fas fa-sun"></i>
+      </button>
     </div>
-  </div>
-</nav>
-{% endif %}
-<body>
-    {% block content %}{% endblock %}
-</body>
-</html>
+  </nav>
+  {% endif %}
+  <body class="bg-white dark:bg-gray-900">
+      {% block content %}{% endblock %}
+  </body>
+  <script>
+    function toggleDarkMode() {
+      const htmlElement = document.documentElement;
+      const isDark = htmlElement.classList.contains('dark');
+      if (isDark) {
+        htmlElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      } else {
+        htmlElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      }
+    }
+
+    // Mantener la preferencia del usuario en el modo oscuro
+    window.onload = function () {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.documentElement.classList.add('dark');
+      }
+    };
+  </script>
+  </html>
