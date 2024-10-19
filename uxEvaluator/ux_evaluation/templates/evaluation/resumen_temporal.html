@@ -3,47 +3,48 @@
 
 {% load static %}
 {% block css %}
-    {% comment %} <link rel="stylesheet" href="{% static 'ux_evaluation/resumen_temporal.css' %}"> {% endcomment %}
+    {% comment %} No se requiere CSS personalizado aquí, ya que estamos utilizando Tailwind {% endcomment %}
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Detalles de Evaluación - {{ software.nombre }}</h1>
-    <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
-        <i class="fas fa-info-circle me-2" style="font-size: 1.5rem;"></i>
-        <span class="text-black">Si cometiste un error, puedes realizar las modificaciones necesarias.</span>
+<div class="container mx-auto mt-10">
+    <h1 class="text-center text-3xl font-bold mb-6 text-gray-800 dark:text-white">Detalles de Evaluación - {{ software.nombre }}</h1>
+
+    <div class="bg-blue-100 dark:bg-gray-700 border-l-4 border-blue-500 text-blue-700 dark:text-blue-300 p-4 flex items-center mb-6 shadow-md rounded-md">
+        <i class="fas fa-info-circle text-2xl mr-4"></i>
+        <span class="text-lg">Si cometiste un error, puedes realizar las modificaciones necesarias.</span>
     </div>
 
-    <form method="post" action="{% url 'confirmar_enviar' software.id %}" class="mb-4">
+    <form method="post" action="{% url 'confirmar_enviar' software.id %}">
         {% csrf_token %}
         {% for categoria, evaluaciones in categorias.items %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h6 class="mb-0">{{ categoria }}</h6>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md mb-6 overflow-hidden">
+                <div class="bg-gray-800 dark:bg-gray-700 text-white p-4">
+                    <h6 class="text-lg font-semibold">{{ categoria }}</h6>
                 </div>
-                <div class="card-body">
-                    <table class="table table-bordered table-striped">
-                        <thead class="thead-light">
-                            <tr>
-                                <th>Criterio</th>
-                                <th>Puntaje</th>
-                                <th>Comentario</th>
+                <div class="p-4">
+                    <table class="min-w-full table-auto border-collapse">
+                        <thead>
+                            <tr class="bg-gray-200 dark:bg-gray-600">
+                                <th class="border px-4 py-2 text-gray-800 dark:text-gray-300">Criterio</th>
+                                <th class="border px-4 py-2 text-gray-800 dark:text-gray-300">Puntaje</th>
+                                <th class="border px-4 py-2 text-gray-800 dark:text-gray-300">Comentario</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for evaluacion in evaluaciones %}
-                                <tr>
-                                    <td>{{ evaluacion.criterio.nombre }}</td>
-                                    <td>
-                                        <input type="number" name="puntaje_{{ evaluacion.id }}" value="{{ evaluacion.puntaje }}" min="0" max="5" class="form-control" required />
+                                <tr class="bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <td class="border px-4 py-2 text-gray-700 dark:text-gray-300">{{ evaluacion.criterio.nombre }}</td>
+                                    <td class="border px-4 py-2">
+                                        <input type="number" name="puntaje_{{ evaluacion.id }}" value="{{ evaluacion.puntaje }}" min="0" max="5" class="w-full px-2 py-1 border rounded-md dark:bg-gray-800 dark:text-white" required />
                                     </td>
-                                    <td>
-                                        <input type="text" name="comentario_{{ evaluacion.id }}" value="{{ evaluacion.comentario|default:'' }}" class="form-control" />
+                                    <td class="border px-4 py-2">
+                                        <input type="text" name="comentario_{{ evaluacion.id }}" value="{{ evaluacion.comentario|default:'' }}" class="w-full px-2 py-1 border rounded-md dark:bg-gray-800 dark:text-white" />
                                     </td>
                                 </tr>
                             {% empty %}
                                 <tr>
-                                    <td colspan="3" class="text-center">No hay evaluaciones disponibles para esta categoría.</td>
+                                    <td colspan="3" class="border text-center py-4 text-gray-700 dark:text-gray-300">No hay evaluaciones disponibles para esta categoría.</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -51,67 +52,58 @@
                 </div>
             </div>
         {% endfor %}
-        
-        <div class="d-flex justify-content-between my-5">
-            <div>
-                <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="modal" data-bs-target="#cancelModal">Eliminar evaluación</button>
-            </div>
-            <div>
-                <button type="submit" onclick="generarPdf()" class="btn btn-success btn-lg">Confirmar y Enviar</button>
-            </div>
+
+        <div class="flex justify-between items-center mt-8">
+            <button type="button" class="bg-red-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-red-600 transition-colors" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                Eliminar evaluación
+            </button>
+            <button type="submit" onclick="generarPdf()" class="bg-green-500 text-white py-2 px-6 rounded-lg shadow-lg hover:bg-green-600 transition-colors">
+                Confirmar y Enviar
+            </button>
         </div>
-        
     </form>
 
-
     <!-- Modal de confirmación de cancelación -->
-<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="cancelModalLabel">Confirmar Eliminar</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <div class="fixed z-10 inset-0 overflow-y-auto hidden" id="cancelModal" aria-labelledby="modal-title" aria-modal="true" role="dialog">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <div class="bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:max-w-lg sm:w-full">
+                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-5 sm:px-6">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">Confirmar Eliminar</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-300">¿Quieres eliminar la evaluación?</p>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-4 sm:px-6 flex justify-end">
+                    <button type="button" class="bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white py-2 px-4 rounded-lg mr-3" data-bs-dismiss="modal">Cerrar</button>
+                    {% if software %}
+                        <form method="post" action="{% url 'eliminar_evaluacion' software_id=software.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600">Confirmar Eliminación</button>
+                        </form>
+                    {% else %}
+                        <button type="button" class="bg-red-500 text-white py-2 px-4 rounded-lg cursor-not-allowed opacity-50" disabled>Confirmar Eliminación</button>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          ¿Quieres eliminar la evaluación?
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          {% if software %}
-            <form method="post" action="{% url 'eliminar_evaluacion' software_id=software.id %}">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-danger">Confirmar Eliminacion</button>
-            </form>
-          {% else %}
-            <button type="button" class="btn btn-danger" disabled>Confirmar Eliminacion</button>
-          {% endif %}
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <script>
     function generarPdf() {
-        // Redirige a la URL para generar el PDF
         window.location.href = "{% url 'generar_pdf' software.id %}";
-        
-        // Luego, redirige al índice después de un breve retraso
         setTimeout(function() {
             window.location.href = "{% url 'index' %}";
-        }, 2000); // Cambia el tiempo según lo necesites (2000 ms = 2 segundos)
+        }, 2000);
     }
+
     document.addEventListener("DOMContentLoaded", function() {
-        // Selecciona todos los enlaces en la barra de navegación
         const navLinks = document.querySelectorAll('nav a');
-    
-        // Deshabilita los enlaces
         navLinks.forEach(link => {
-          link.addEventListener('click', function(event) {
-            event.preventDefault(); // Previene la acción de navegación
-          });
+            link.addEventListener('click', function(event) {
+                event.preventDefault();
+            });
         });
-      });
+    });
 </script>
 
 {% endblock %}

@@ -5,87 +5,87 @@
 {% load custom_filters %}
 
 {% block css %}
-    <link rel="stylesheet" href="{% static 'ux_evaluation/stepper.css' %}">
+    {% comment %} <link rel="stylesheet" href="{% static 'ux_evaluation/stepper.css' %}"> {% endcomment %}
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
+<div class="container mx-auto mt-5">
   {% if step == 1 %}
-    <h1 class="text-center">Ingresa el nombre del software para evaluar</h1>
-    <p class="text-center">Proporcione el nombre del software que desea evaluar. Esto nos ayudará a organizar la evaluación de manera efectiva.</p>
-    <form method="post" class="mt-4">
-      {% csrf_token %}
-      <div class="mb-3">
-        <input type="text" name="software_nombre" class="form-control" placeholder="Nombre del software" required>
-      </div>
-      <div class="text-center">
-        <button type="submit" class="btn btn-primary">Comenzar evaluación</button>
-      </div>
-      {% if error %}
-        <p class="text-danger text-center mt-3">{{ error }}</p>
-      {% endif %}
-    </form>
+  <h1 class="text-center text-3xl font-semibold dark:text-white">Ingresa el nombre del software para evaluar</h1>
+  <p class="text-center text-lg mt-2 dark:text-gray-300">Proporcione el nombre del software que desea evaluar. Esto nos ayudará a organizar la evaluación de manera efectiva.</p>
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+    <div class="mb-4">
+      <input type="text" name="software_nombre" class="border border-gray-300 rounded-md p-2 w-full dark:border-gray-600 dark:bg-gray-800 dark:text-white" placeholder="Nombre del software" required>
+    </div>
+    <div class="text-center">
+      <button type="submit" class="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 transition duration-200 dark:bg-blue-600 dark:hover:bg-blue-700">Comenzar evaluación</button>
+    </div>
+    {% if error %}
+      <p class="text-red-500 text-center mt-3 dark:text-red-400">{{ error }}</p>
+    {% endif %}
+  </form>
   {% else %}
-    <div class="py-3 m-5 bg-white row g-0 align-items-start shadow">
-      <div class="col-md-1 d-flex justify-content-center align-items-start">
-          <div class="square-icon-container bg-black rounded-4">
+    <div class="py-3 m-5 bg-white shadow-md rounded-lg dark:bg-gray-800 dark:shadow-lg">
+      <div class="w-1/12 flex justify-center items-start">
+          <div class="bg-black rounded-lg p-3">
               <i class="fa-solid icon text-white {{ icono }}"></i>
           </div>
       </div>
   
-      <div class="col-md-11 content-padding">
-        <p class="text-black fs-1 fw-semibold font-family-Inter m-0">{{ step|add:"-1" }}. {{ categoria.nombre }}</p>
-        <p class="opacity-75 text-black fs-6 fw-normal font-family-Inter m-1">{{ descripcion }}</p>
+      <div class="w-11/12 p-3">
+        <p class="text-black text-xl font-semibold dark:text-white">{{ step|add:"-1" }}. {{ categoria.nombre }}</p>
+        <p class="text-gray-600 text-base mt-1 dark:text-gray-400">{{ descripcion }}</p>
       </div>
     </div>
-    <div class="py-3 m-5 bg-white row g-0 align-items-start shadow">
-        <div class="col-md-11 content-padding">
-          <h2 class="text-start">Se esta evaluando: <span class="fw-bold">{{ software.nombre }}</span></h2>
+    <div class="py-3 m-5 bg-white shadow-md rounded-lg dark:bg-gray-800 dark:shadow-lg">
+        <div class="p-3">
+          <h2 class="text-left text-lg dark:text-white">Se está evaluando: <span class="font-bold">{{ software.nombre }}</span></h2>
             <form method="post" class="mt-4">
               {% csrf_token %}
-              <div class="table-responsive">
-                <table class="table table-bordered">
-                  <thead class="table-light">
-                    <tr class="table-dark">
-                      <th scope="col">Criterio</th>
-                      <th scope="col">Descripción</th>
-                      <th scope="col">Puntaje</th>
-                      <th scope="col">Comentario</th>
+              <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 dark:bg-gray-800 dark:border-gray-600">
+                  <thead class="bg-gray-200 dark:bg-gray-700">
+                    <tr class="text-left">
+                      <th class="border-b px-4 py-2 text-gray-700 dark:text-gray-300">Criterio</th>
+                      <th class="border-b px-4 py-2 text-gray-700 dark:text-gray-300">Descripción</th>
+                      <th class="border-b px-4 py-2 text-gray-700 dark:text-gray-300">Puntaje</th>
+                      <th class="border-b px-4 py-2 text-gray-700 dark:text-gray-300">Comentario</th>
                     </tr>
                   </thead>
                   <tbody>
                     {% for criterio in criterios %}
                     <tr>
-                      <td scope="row">{{ criterio.nombre }}</td>
-                      <td>{{ criterio.descripcion }}</td>
-                      <td>
+                      <td class="border-b px-4 py-2 dark:text-gray-300">{{ criterio.nombre }}</td>
+                      <td class="border-b px-4 py-2 dark:text-gray-300">{{ criterio.descripcion }}</td>
+                      <td class="border-b px-4 py-2">
                         {% with descripciones=descripciones_puntajes|get_item:criterio.id %}
-                        <div class="d-flex flex-wrap justify-content-center">
-                          <div class="form-check me-3">
-                            <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_1" value="1" required data-bs-toggle="tooltip" title="{{ descripciones.0.descripcion }}">
-                            <label class="form-check-label" for="evaluacion_{{ criterio.id }}_1">1</label>
+                        <div class="flex flex-wrap justify-center">
+                          <div class="mr-3">
+                            <input class="form-radio" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_1" value="1" required title="{{ descripciones.0.descripcion }}">
+                            <label class="ml-1" for="evaluacion_{{ criterio.id }}_1">1</label>
                           </div>
-                          <div class="form-check me-3">
-                            <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_2" value="2" data-bs-toggle="tooltip" title="{{ descripciones.1.descripcion }}">
-                            <label class="form-check-label" for="evaluacion_{{ criterio.id }}_2">2</label>
+                          <div class="mr-3">
+                            <input class="form-radio" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_2" value="2" title="{{ descripciones.1.descripcion }}">
+                            <label class="ml-1" for="evaluacion_{{ criterio.id }}_2">2</label>
                           </div>
-                          <div class="form-check me-3">
-                            <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_3" value="3" data-bs-toggle="tooltip" title="{{ descripciones.2.descripcion }}">
-                            <label class="form-check-label" for="evaluacion_{{ criterio.id }}_3">3</label>
+                          <div class="mr-3">
+                            <input class="form-radio" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_3" value="3" title="{{ descripciones.2.descripcion }}">
+                            <label class="ml-1" for="evaluacion_{{ criterio.id }}_3">3</label>
                           </div>
-                          <div class="form-check me-3">
-                            <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_4" value="4" data-bs-toggle="tooltip" title="{{ descripciones.3.descripcion }}">
-                            <label class="form-check-label" for="evaluacion_{{ criterio.id }}_4">4</label>
+                          <div class="mr-3">
+                            <input class="form-radio" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_4" value="4" title="{{ descripciones.3.descripcion }}">
+                            <label class="ml-1" for="evaluacion_{{ criterio.id }}_4">4</label>
                           </div>
-                          <div class="form-check me-3">
-                            <input class="form-check-input" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_5" value="5" data-bs-toggle="tooltip" title="{{ descripciones.4.descripcion }}">
-                            <label class="form-check-label" for="evaluacion_{{ criterio.id }}_5">5</label>
+                          <div class="mr-3">
+                            <input class="form-radio" type="radio" name="evaluacion_{{ criterio.id }}" id="evaluacion_{{ criterio.id }}_5" value="5" title="{{ descripciones.4.descripcion }}">
+                            <label class="ml-1" for="evaluacion_{{ criterio.id }}_5">5</label>
                           </div>
                         </div>
                         {% endwith %}
                       </td>
-                      <td>
-                        <textarea name="comentario_{{ criterio.id }}" class="form-control" placeholder="Comentario (opcional)" rows="3"></textarea>
+                      <td class="border-b px-4 py-2">
+                        <textarea name="comentario_{{ criterio.id }}" class="border border-gray-300 rounded-md p-2 w-full dark:border-gray-600 dark:bg-gray-800 dark:text-white" placeholder="Comentario (opcional)" rows="3"></textarea>
                       </td>
                     </tr>
                     {% endfor %}
@@ -93,21 +93,21 @@
                 </table>
               </div>
               <div class="text-center mt-4">
-                <div class="d-flex justify-content-between">
+                <div class="flex justify-between">
                   <div>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">Cancelar</button>
+                    <button type="button" class="bg-red-500 text-white rounded-md p-2 hover:bg-red-600 transition duration-200" onclick="openModal()">Cancelar</button>
                   </div>
                   
                   <div>
                     {% if step > 2 %}
                       <a href="{% url 'stepper' step=step|add:"-1" software_id=software.id %}">
-                        <button type="button" class="btn btn-secondary">Regresar</button>
+                        <button type="button" class="bg-gray-400 text-white rounded-md p-2 hover:bg-gray-500 transition duration-200">Regresar</button>
                       </a>
                     {% endif %}
                     {% if step > categorias_totales %}
-                      <button type="submit" name="enviar_evaluacion" class="btn btn-success">Enviar evaluación</button>
+                      <button type="submit" name="enviar_evaluacion" class="bg-green-500 text-white rounded-md p-2 hover:bg-green-600 transition duration-200">Enviar evaluación</button>
                     {% else %}
-                      <button type="submit" name="siguiente" class="btn btn-primary">Siguiente</button>
+                      <button type="submit" name="siguiente" class="bg-blue-500 text-white rounded-md p-2 hover:bg-blue-600 transition duration-200">Siguiente</button>
                     {% endif %}
                   </div>
                 </div>
@@ -119,61 +119,36 @@
 </div>
 
 <!-- Modal de confirmación de cancelación -->
-<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="cancelModalLabel">Confirmar Cancelación</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        ¿Quieres cancelar la evaluación?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        {% if software %}
-          <form method="post" action="{% url 'eliminar_evaluacion' software_id=software.id %}">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger">Confirmar Cancelación</button>
-          </form>
-        {% else %}
-          <button type="button" class="btn btn-danger" disabled>Confirmar Cancelación</button>
-        {% endif %}
-      </div>
+<div id="cancelModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-gray-900 bg-opacity-50">
+  <div class="bg-white rounded-lg p-5 dark:bg-gray-800">
+    <div class="flex justify-between items-start">
+      <h5 class="text-lg font-semibold dark:text-white">Confirmar Cancelación</h5>
+      <button type="button" class="text-gray-500 hover:text-gray-700" onclick="closeModal()">✖️</button>
+    </div>
+    <div class="mt-4 dark:text-gray-400">
+      ¿Quieres cancelar la evaluación?
+    </div>
+    <div class="mt-4 flex justify-end">
+      <button type="button" class="bg-gray-400 text-white rounded-md p-2 hover:bg-gray-500 transition duration-200" onclick="closeModal()">Cerrar</button>
+      {% if software %}
+        <form method="post" action="{% url 'eliminar_evaluacion' software_id=software.id %}" class="inline">
+          {% csrf_token %}
+          <button type="submit" class="bg-red-500 text-white rounded-md p-4 hover:bg-red-600 transition duration-200">Confirmar</button>
+        </form>
+      {% endif %}
     </div>
   </div>
 </div>
 
-
 <script>
-    // Inicializa los tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl);
-    });
+  function openModal() {
+    document.getElementById('cancelModal').classList.remove('hidden');
+    document.getElementById('cancelModal').classList.add('flex');
+  }
 
-    // Agrega un evento para ocultar el tooltip al seleccionar un input
-    tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-        tooltipTriggerEl.addEventListener('change', function() {
-            // Ocultar el tooltip asociado al input
-            var tooltipInstance = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
-            if (tooltipInstance) {
-                tooltipInstance.hide(); // Ocultar el tooltip
-            }
-        });
-    });
-
-    document.addEventListener("DOMContentLoaded", function() {
-      // Selecciona todos los enlaces en la barra de navegación
-      const navLinks = document.querySelectorAll('nav a');
-  
-      // Deshabilita los enlaces
-      navLinks.forEach(link => {
-        link.addEventListener('click', function(event) {
-          event.preventDefault(); // Previene la acción de navegación
-        });
-      });
-    });
+  function closeModal() {
+    document.getElementById('cancelModal').classList.add('hidden');
+    document.getElementById('cancelModal').classList.remove('flex');
+  }
 </script>
-
 {% endblock %}
